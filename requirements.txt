@@ -2,3 +2,7 @@ python-dotenv
 huggingface_hub
 groq
 google-genai
+uvicorn
+fastapi
+httpx
+pydantic
