@@ -75,12 +75,12 @@ class ModelScheduler:
         print(f"[Scheduler] Provider: {provider}")
 
         try:
-            answer = await self._call(provider, prompt, timeout=timeouts[provider])
+            answer = await self._call(provider, fullprompt, timeout=timeouts[provider])
             used_provider = provider
         except (asyncio.TimeoutError, Exception) as e:
             print(f"[Scheduler] {provider} failed: {e} → Gemini fallback")
             try:
-                answer = await self._call("gemini", prompt, timeout=15.0)
+                answer = await self._call("gemini", fullprompt, timeout=15.0)
                 used_provider = "gemini"
             except (asyncio.TimeoutError, Exception) as e:
                 print(f"[Scheduler] Gemini failed: {e}")
