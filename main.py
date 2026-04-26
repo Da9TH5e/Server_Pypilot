@@ -39,20 +39,32 @@ class ModelScheduler:
             "gemini": GeminiModel()
         }
         
-    async def _call(self, provider: str, prompt: str, timeout: float) -> str:
+    async def _call(self, provider: str, fullprompt: str, timeout: float) -> str:
         loop = asyncio.get_event_loop()
         model = self.models["groq"] if provider == "light" else self.models["huggingface"] if provider == "heavy" else self.models["gemini"]
         fn = model.generate_response if hasattr(model, "generate_response") else model.gen_response
         return await asyncio.wait_for(
-            loop.run_in_executor(None, fn, prompt),
+            loop.run_in_executor(None, fn, fullprompt),
             timeout=timeout
         )
         
     async def schedule(self, job: Job) -> None:
         prompt = job.request.prompt
+        context = job.request.context
         provider = job.request.provider
         answer = None
         used_provider = "none"
+        
+        fullprompt = (
+            "You are Pysitant, an AI assistant that helps developers debug and manage their projects.\n"
+            "You have full knowledge of the user's project structure below.\n\n"
+            "PROJECT FILE STRUCTURE:\n"
+            "------------------------\n"
+            f"{json.dumps(context, indent=2)}\n\n"
+            "USER QUESTION:\n"
+            "--------------\n"
+            f"{prompt}"
+        )
 
         timeouts = {
             "groq": 10.0,
