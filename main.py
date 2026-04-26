@@ -109,19 +109,24 @@ async def worker():
         finally:
             await outgoing_queue.put(job)
             incoming_queue.task_done()
-
-# ── Lifespan ──────────────────────────────────────────────────────────────────
+            
+async def outgoing_worker():
+    print("[Outgoing Worker] Started.")
+    while True:
+        job: Job = await outgoing_queue.get()
+        outgoing_queue.task_done()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     workers = [asyncio.create_task(worker()) for _ in range(3)]
-    print("[Server] 3 workers started.")
+    outgoing = asyncio.create_task(outgoing_worker())
+    print("[Server] 3 workers + 1 outgoing worker started.")
     yield
     for w in workers:
         w.cancel()
+    outgoing.cancel()
     print("[Server] Workers stopped.")
 
-# ── App ───────────────────────────────────────────────────────────────────────
 
 app = FastAPI(title="PyPilot Server", lifespan=lifespan)
 
@@ -132,7 +137,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Endpoints ─────────────────────────────────────────────────────────────────
 
 @app.get("/health")
 async def health():
