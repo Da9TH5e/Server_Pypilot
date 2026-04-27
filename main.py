@@ -34,14 +34,14 @@ outgoing_queue: asyncio.Queue[Job] = asyncio.Queue(maxsize=100)
 class ModelScheduler:
     def __init__(self) -> None:
         self.models = {
-            "groq": GroqModels(),
-            "huggingface": HuggingFaceModels(),
+            "light": GroqModels(),
+            "heavy": HuggingFaceModels(),
             "gemini": GeminiModel()
         }
         
     async def _call(self, provider: str, fullprompt: str, timeout: float) -> str:
         loop = asyncio.get_event_loop()
-        model = self.models["groq"] if provider == "light" else self.models["huggingface"] if provider == "heavy" else self.models["gemini"]
+        model = self.models[provider]  # ← simple direct lookup
         fn = model.generate_response if hasattr(model, "generate_response") else model.gen_response
         return await asyncio.wait_for(
             loop.run_in_executor(None, fn, fullprompt),
@@ -67,8 +67,8 @@ class ModelScheduler:
         )
 
         timeouts = {
-            "groq": 10.0,
-            "huggingface": 15.0,
+            "light": 10.0,
+            "heavy": 15.0,
             "gemini": 15.0
         }
 
