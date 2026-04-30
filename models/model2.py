@@ -13,12 +13,7 @@ class HuggingFaceModels:
         stream = self.client.chat.completions.create(
             model="Qwen/Qwen2.5-72B-Instruct",
             messages=[{"role": "user", "content": prompt}],
-            stream=True,
+            stream=False,
         )
 
-        full_response = ""
-        for chunk in stream:
-            content = chunk.choices[0].delta.content
-            if content:
-                full_response += content
-        return full_response
+        print(stream.choices[0].message)
