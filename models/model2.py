@@ -16,4 +16,4 @@ class HuggingFaceModels:
             stream=False,
         )
 
-        print(stream.choices[0].message)
+        print(stream.choices[0].message.content)
