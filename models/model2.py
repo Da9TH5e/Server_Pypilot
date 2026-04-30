@@ -11,7 +11,11 @@ class HuggingFaceModels:
 
     def gen_response(self, prompt: str) -> Optional[str]:
         stream = self.client.chat.completions.create(
+<<<<<<< Updated upstream
             model="Qwen/Qwen2.5-72B-Instruct",
+=======
+            model="Qwen/Qwen3-Coder-30B-A3B-Instruct:ovhcloud",
+>>>>>>> Stashed changes
             messages=[{"role": "user", "content": prompt}],
             stream=True,
         )
