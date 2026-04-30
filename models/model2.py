@@ -11,7 +11,7 @@ class HuggingFaceModels:
 
     def gen_response(self, prompt: str) -> Optional[str]:
         stream = self.client.chat.completions.create(
-            model="Qwen/Qwen2.5-72B-Instruct:ovhcloud",
+            model="Qwen/Qwen3-Coder-30B-A3B-Instruct:ovhcloud",
             messages=[{"role": "user", "content": prompt}],
             stream=False,
         )
